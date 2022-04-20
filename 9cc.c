@@ -61,6 +61,7 @@ Node *expr();
 Node *mul();
 Node *primary();
 void gen(Node *node);
+Node *unary();
 
 // ----- 関数実装 -----
 
@@ -189,13 +190,13 @@ Node *expr(){
 
 // mul
 Node *mul(){
-  Node *node = primary();
+  Node *node = unary();
 
   while(1){
     if(consume('*'))
-      node = new_node(ND_MUL, node, primary());
+      node = new_node(ND_MUL, node, unary());
     else if(consume('/'))
-      node = new_node(ND_DIV, node, primary());
+      node = new_node(ND_DIV, node, unary());
     else
       return node;
   }
@@ -246,6 +247,15 @@ void gen(Node *node){
   }
 
   printf("  push rax\n");
+}
+
+// unary
+Node *unary(){
+  if(consume('+'))
+    return primary();
+  if(consume('-'))
+    return new_node(ND_SUB, new_node_num(0), primary());
+  return primary();
 }
 
 // ----- メイン関数 -----
